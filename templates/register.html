@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Other meta tags and title -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <!-- Your existing CSS and other code -->
+    
+
+    <title>Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 400px;
+            height: 680px;
+            padding: 10px;
+            background-color: #fff;
+            margin-left: 8rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 2px solid #53c9c2; /* Border color */
+        }
+        h2{
+            color:#53c9c2
+        }
+
+        label {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #53c9c2;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 2px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color:#53c9c2;
+            color:white;
+        }
+
+        #camera-preview {
+            max-width: 100%;
+            margin-top: 15px;
+        }
+
+        #captured-photo {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .button-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .button-container button {
+            display: inline-block;
+        }
+        .back-video{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    /* position: fixed; */
+    min-width: 100%;
+    min-height: 100%;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video autoplay loop muted plays-inline class="back-video">
+            <source src="/static/sam4.mp4" type="video/mp4">
+        </video>  
+        <h2 style="text-align: center;">Registration Form</h2>
+        <form id="registrationForm" action='/register' method='POST'>
+            <p style="color:tomato">{{message}}</p>
+            <label for="name"><i class="fas fa-user"></i> Name:</label>
+            <input type="text" id="name" name="name" required>
+        
+            <label for="phone"><i class="fas fa-phone"></i> Phone Number:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+        
+            <label for="address"><i class="fas fa-map-marker-alt"></i> Address:</label>
+            <input type="text" id="address" name="address" required>
+        
+
+
+            <label for="capture">Live Camera Capture:</label>
+            <video id="camera-preview" width="390" height="300" autoplay playsinline></video>
+            <!-- Add this input field to the form -->
+            <input type="hidden" id="capturedPhotoData" name="capturedPhotoData">
+
+            <canvas id="captured-photo" width="390" height="300"></canvas>
+
+            <div class="button-container">
+                <button type="button" onclick="capturePhoto()">Capture Photo</button>
+                <button type="button" onclick="retakePhoto()">Retake</button>
+                <button type="submit">Register</button>
+                <button type="button" onclick="face_recognition">Face Login</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        let videoStream;
+        const videoElement = document.getElementById('camera-preview');
+        const capturedPhotoCanvas = document.getElementById('captured-photo');
+        const captureButton = document.querySelector('button[onclick="capturePhoto()"]');
+        const retakeButton = document.querySelector('button[onclick="retakePhoto()"]');
+
+        async function startCamera() {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = videoStream;
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+            }
+        }
+
+        function stopCamera() {
+            if (videoStream) {
+                const tracks = videoStream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+        }
+
+        function capturePhoto() {
+            const context = capturedPhotoCanvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, capturedPhotoCanvas.width, capturedPhotoCanvas.height);
+        
+            // Get the captured image data as a base64-encoded string
+            const imageData = capturedPhotoCanvas.toDataURL('image/png');
+        
+            // Set the image data in the hidden input field
+            document.getElementById('capturedPhotoData').value = imageData;
+        
+            // Show the captured photo canvas and hide the live camera preview
+            capturedPhotoCanvas.style.display = 'block';
+            videoElement.style.display = 'none';
+        
+            // Disable the "Capture Photo" button and enable the "Retake" button
+            captureButton.disabled = true;
+            retakeButton.disabled = false;
+        }
+        
+        
+        function retakePhoto() {
+            // Show the live camera preview and hide the captured photo canvas
+            videoElement.style.display = 'block';
+            capturedPhotoCanvas.style.display = 'none';
+
+            // Enable the "Capture Photo" button and disable the "Retake" button
+            captureButton.disabled = false;
+            retakeButton.disabled = true;
+        }
+
+
+        // Initialize the camera when the page loads
+        startCamera();
+    </script>
+</body>
+</html>

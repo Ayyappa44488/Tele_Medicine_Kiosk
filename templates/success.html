@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Success</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #63c5bf;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 200px;
+        }
+        
+        .back-video{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            /* position: fixed; */
+            min-width: 100%;
+            min-height: 100%;}
+    </style>
+</head>
+<body onload="speakOnLoad()">
+    <video autoplay loop muted plays-inline class="back-video">
+        <source src="/static/sam4.mp4" type="video/mp4">
+    </video> 
+    <div class="container">
+        <h2>స్వాగతం {{name}}</h2>
+        <h2>మీరు విజయవంతంగా డాక్టర్ని {{time}} సమయానికి {{doctor}} ని సంప్రదించగలరు </h2>
+        <h2>మీరు మళ్ళీ చెప్పిన సమయానికి రండి</h2>
+    </div>
+</body>
+<script>
+    function home(){
+        window.location.href = "/logout";
+    }
+    setTimeout(home, 10000);
+</script>
+</html>

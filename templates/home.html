@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link class="logo1" href="/static/default.png" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="/static/home.css">
+    <title>The Mavericks</title> 
+</head>
+<body>   
+    <header class="header">
+        <nav>
+            <input id="nav-toggle" type="checkbox">
+            <div class="logo content" style="margin-left:0px;"><a href="#"><img src="/static/icon.jpg" alt="logo" ></a></div>
+            <ul class="links">
+                <li><a href="#Home">Home</a></li>
+                <li><a href="#Features">Features</a></li>
+                <li><a href="#Gallery">Gallery</a></li>
+                <li><a href="#Contact">Contact</a></li>
+                {%if session['user'] or session['asha'] or session['doctor']%}<li><span onclick="openForm()"><img src="/static/user.png" class="logo1" alt="info" style="margin-top:5px;height:50px;width:50px;"></span></li>{%endif%}
+            </ul>
+            <label for="nav-toggle" class="icon-burger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </label>
+        </nav>
+    </header><!-- Button to open the form -->
+    <video autoplay loop muted plays-inline class="back-video">
+        <source src="/static/sam4.mp4" type="video/mp4">
+    </video>  
+    <div class="form-popup" id="myForm">
+      <form class="form-container" action="/logout" >
+        <span onclick="closeForm()" class="close" title="Close window">&times;</span>
+        <center><img src="/static/user.png"  style="border-radius:2.8cm"><br><br>
+          <hr><br>
+          <label for="email"><b><span style="color:#fff">Hai...Welcome to Tele-medicine kiosk :)</span></b></label>
+          <br><br>
+          <label for="psw"><b><span style="color:#fff"></span></b></label>
+        </center>
+        <br>
+        <hr><br>
+        {%if session['user']%}<button type="button" class="btn" onclick="document.location='/doctorregister' "><b>Register Doctor</b></button>{%endif%}
+        {%if session['user']%}<button type="button" class="btn" onclick="document.location='/asha' "><b>Asha Worker Register</b></button>{%endif%}
+        <button type="submit" class="btn" onclick="document.location='/logout' "><b>Logout</b></button>
+      </form>
+    </div>
+    <main>
+        <section id="Home">
+        <div class="hero">
+            <h2 style="color:tomato">{{message}}</h2>
+            <h1>TELEMEDICINE KIOSK</h1>
+            <div>
+                {%if not session['user'] and not session['asha'] and not session['doctor']%}
+               <button type="button" onclick="document.location='/login'" class="button">LOGIN</button>{%endif%}
+               {% if session['user']%}
+                <button type="button" onclick="document.location='/registerpage'" class="button">REGISTRATION</button>{%endif%}
+                {%if not session['asha'] and not session['doctor']%}
+                <button type="button" onclick="document.location='/face_recognition'" class="button">Face Recognition</button>{%endif%}
+                {%if session['asha']%}
+                <button type="button" onclick="document.location='/asha_data_fetch'" class="button">Prescription schedule</button>{%endif%}
+                {%if session['doctor']%}
+                <button type="button" onclick="document.location='/doctorschedule'" class="button">Doctor schedule</button>{%endif%}
+                <!-- <button type="button" onclick="document.location='/login'" class="button">LOGIN</button> -->
+            </div>
+        </div>
+    </section>
+    <!-- <section id="home2">
+        <div class="home2">
+            <div class="content1">
+                <h1 style="color: #53C9C2">Hi, I am epidermX :)</h1>
+                <p style="font-size: 15px;">I am a very advanced Artificial Intelligence (AI) robot built by my human
+                    founders to analyze* skin conditions</p>
+                <a href="#Faq" target="blank">
+                    <div class="btn1">Read more</div>
+                </a>
+            </div>
+            <div class="images"><img src="/static/hi.jpeg" alt=""></div>
+        </div>
+    </section>
+    <section id="home3">
+        <div class="home3">
+            <div class="images"><img src="/static/scan.jpeg" alt=""></div>
+            <div class="content1">
+                <h1 style="color: #53C9C2;">My Mission...!!</h1>
+                <p style="font-size: 15px;margin-left: 20%;margin-right: 13%;">I can think and learn. I become smarter every time you
+                    use me. With your participation, one day I will be able to
+                    solve global healthcare challenges!</p>
+                <a href="#Faq" target="blank">
+                    <div class="btn1">Read more</div>
+                </a>
+            </div>
+        </div> -->
+    </section>
+    
+</main>
+    <script>
+        const toggleBtn = document.querySelector('.toggle_btn')
+        const toggleBtnIcon = document.querySelector('.toggle_btn i')
+        const dropDownMenu = document.querySelector('.dropdown_menu')
+
+        toggleBtn.onclick = function (){
+            dropDownMenu.classList.toggle('open')
+            const isOpen = dropDownMenu.classList.contains('open')
+
+            toggleBtnIcon.classList = isOpen
+            ? 'fa-solid fa-xmark'
+            : 'fa-solid fa-bars'
+        }
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+          }
+    
+          function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+          }
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Design || Future Web</title>
+    <link rel="stylesheet" href="/static/dashboard.css" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+</head>
+
+<body>
+    <div class="header_fixed" id="userdata">
+        <table>
+            <div class="head">
+                <thead>
+                    <tr style="border: 2px solid #53C9C2;">
+                        <th>Doctor<span id="span">Dashboard</span></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </div>
+            <tbody>
+                <tr style="border: 2px solid #53C9C2;">
+                    <th>ID</th>
+                    <th>Link</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Image</th>
+                </tr>
+                {% for row in data %}
+                <tr>
+                    <td>{{row.id}}</td>
+                    <td><a href={{row.link}}>Click</a></td>
+                    <td>{{ row.date }}</td>
+                    <td>{{row.time}}</td>
+                    <td>
+                        <input type="file" name="image" id="image{{ row.id }}">
+                        <button onclick="uploadImage('{{ row.id }}')">Upload</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div><br>
+    <center><button onclick="location.href='/'" class="btn">Go Home</button></center>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    <script>
+        window.onload = function () {
+            document.getElementById("download-pdf")
+                .addEventListener("click", () => {
+                    const invoice = this.document.getElementById("userdata");
+                    console.log(invoice);
+                    console.log(window);
+                    html2pdf().from(invoice).save();
+                })
+        }
+        function uploadImage(rowId) {
+            const fileInput = document.getElementById(`image${rowId}`);
+            const file = fileInput.files[0];
+
+            if (file) {
+                // Assuming you're using FormData to send the image to the backend
+                const formData = new FormData();
+                formData.append('image', file);
+
+                // Add other data from the row as needed
+                formData.append('id', rowId);
+
+                // Make a fetch request to your backend endpoint
+                fetch('/upload-image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the backend if needed
+                    console.log('Image uploaded successfully:', data);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                });
+            } else {
+                console.error('No file selected.');
+            }
+        }
+    </script>
+</body>
+</html>

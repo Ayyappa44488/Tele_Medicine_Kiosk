@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Assistant</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 80px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    #microphone {
+      width: 60px;
+      height: 60px;
+      background-color: #007bff;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    #microphone:hover {
+      background-color: #0056b3;
+    }
+    #microphone.active {
+      background-color: #e74c3c;
+    }
+    #microphone img {
+      width: 40px;
+      height: 40px;
+      fill: #fff;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
+    .back-video{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        /* position: fixed; */
+        min-width: 100%;
+        min-height: 100%;
+    }
+</style>
+</head>
+<body>
+    <video autoplay loop muted plays-inline class="back-video">
+        <source src="/static/sam4.mp4" type="video/mp4">
+    </video>  
+<div class="container">
+    <h1>స్వాగతం {{session['telugu']}}</h1>
+    <!-- <p>Tap the microphone and speak in Telugu.</p> -->
+    <div id="microphone">
+      <img id="mic-icon" src="/static/microphone.svg" alt="Microphone">
+    </div>
+    <!-- <button id="start-btn">Start Listening</button> -->
+    <div id="output"></div>
+  </div>
+<script>
+  const outputDiv = document.getElementById('output');
+  const micDiv= document.getElementById('microphone');
+  const micIcon = document.getElementById('mic-icon');
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = 'te-IN'; // Telugu language for recognition
+  micDiv.addEventListener('click', () => {
+    micDiv.classList.add('active');
+    recognition.start();
+  });
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    sendTranscriptToBackend(transcript);
+    recognition.stop();
+    micDiv.classList.remove('active');
+  };
+
+  recognition.onend = function() {
+    micDiv.classList.remove('active');
+  };
+
+  recognition.onerror = function(event) {
+    console.error('Speech recognition error:', event.error);
+    micDiv.classList.remove('active');
+  };
+  function sendTranscriptToBackend(transcript) {
+    const formData = new FormData();
+    formData.append('transcript', transcript);
+    fetch('/translate', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        window.location.href='/predict';
+    })
+    .catch(error => {
+        console.error('Error sending transcript:', error);
+    });
+}
+
+</script>
+</body>
+</html>

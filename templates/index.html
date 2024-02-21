@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('download (1).jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-position: center center;
+            padding: 60px;
+          }
+      
+          video {
+            background-color: white;
+            border: 2px solid #333;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            animation: pulsate 2s infinite;
+           
+          }
+          h1{
+             /* text-align: center; */
+             font-size: 80px;
+             color: lightcoral;
+           
+          }
+          @keyframes pulsate {
+            /* Define the pulsating effect */
+            0% {
+              transform: scale(1);
+            }
+            50% {
+              transform: scale(1.1);
+            }
+            100% {
+              transform: scale(1);
+            }
+          }
+        </style>
+        <title>Video Frame Streaming</title>
+</head>
+<body>
+    <h1>Face <br>Recognition</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        var x=0;
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+
+                // Add an event listener to capture each video frame
+                video.addEventListener('play', function () {
+                    const sendFrameToBackend = function () {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        // Get the current frame as a data URL
+                        const frameDataUrl = canvas.toDataURL('image/jpeg');
+
+                        // Send the frameDataUrl to the backend (you can use AJAX, fetch, etc.)
+                        // Example using fetch:
+                        fetch('/backend-endpoint', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ frame: frameDataUrl }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data);
+                            if (data.status === 'success') {
+                                // Redirect to success.html upon success
+                                window.location.href = '/voice';
+                                
+                                // Stop the video stream
+                                stream.getTracks().forEach(track => track.stop());
+                            } else{
+                                // Repeat the process for the next frame if not successful
+                                console.log(x);
+                                if(data.status === 'error' || data.status === 'No'){
+                                    console.log('No face detected');
+                                    requestAnimationFrame(sendFrameToBackend);
+                                }
+                                else{
+                                x++;
+                                console.log(x);
+                                if(x<3){
+                                requestAnimationFrame(sendFrameToBackend);
+                                }
+                                else{
+                                    window.location.href = '/registerpage';
+                                }
+                            }
+                            }
+                        })
+                        .catch(error => console.error('Error sending frame to the backend:', error));
+                    };
+
+                    // Start sending frames to the backend
+                    sendFrameToBackend();
+                });
+            })
+            .catch((error) => {
+                console.error('Error accessing camera:', error);
+            });
+    </script>
+</body>
+</html>
