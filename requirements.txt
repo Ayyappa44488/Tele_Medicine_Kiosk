@@ -1,5 +1,5 @@
 flask
-cv2
+opencv-python
 face_recognition
 os
 mediapipe
